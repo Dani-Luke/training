@@ -1,0 +1,25 @@
+version: '3.9'
+services:
+  webserver:
+    image: gitlab.atwinta.ru:8443/basic_image/nginx:1.27.0-alpine3.19
+    restart: always
+    labels:
+      - traefik.enable=true
+            #Базовая
+      - traefik.http.routers.${APP_NAME}.middlewares=${APP_NAME}-auth
+      - traefik.http.middlewares.${APP_NAME}-auth.basicauth.users=${BASIC_AUTH_USERS}
+
+      - traefik.http.routers.${APP_NAME}.rule=Host(`manager-${DOMAIN}`) || (Host(`${DOMAIN}`) && PathPrefix(`/manager`, `/api`,  `/` , `/assets`, `/connectors`, `/sitemap.xml`, `/robots.txt`))
+      - traefik.http.routers.${APP_NAME}.tls=true
+      - traefik.http.routers.${APP_NAME}.tls.certresolver=resolver
+      - traefik.http.routers.${APP_NAME}.tls.domains[0].main=${DOMAIN}
+      - traefik.http.routers.${APP_NAME}.entrypoints=websecure
+      - traefik.http.services.${APP_NAME}.loadbalancer.server.port=80
+    volumes:
+      - ./files:/var/www/html
+#      - ./config/nginx:/etc/nginx/conf.d
+
+networks:
+  default:
+    external: true
+    name: ${DEF_NETWORK:-traefik_main}
