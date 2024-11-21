@@ -1,0 +1,15 @@
+#!/bin/bash
+
+DB_PASS="qwerty123456"
+CONTAINER_NAME="mysql_container"  
+BACKUP_DIR="./db_backups"
+
+mkdir -p "$BACKUP_DIR"
+
+docker exec -i "$CONTAINER_NAME" mysqldump -uroot -p"$DB_PASS" testdb > "$BACKUP_DIR/dumpfile2.sql"
+
+if [ $? -eq 0 ]; then
+    echo "Дамп базы данных успешно создан: $BACKUP_DIR/dumpfile2.sql"
+else
+    echo "Произошла ошибка при создании дампа."
+fi
