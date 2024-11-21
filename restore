@@ -1,0 +1,16 @@
+#!/bin/bash
+
+DB_PASS="qwerty123456"
+CONTAINER_NAME="mysql_container"  
+DUMP_FILE="./db_backups/dumpfile3.sql"
+DB_NAME="testdb"
+
+# Восстановление базы данных из дампа
+docker exec -i "$CONTAINER_NAME" mysql -uroot -p"$DB_PASS" "$DB_NAME" < "$DUMP_FILE"
+
+# Проверка, была ли команда успешной
+if [ $? -eq 0 ]; then
+    echo "База данных успешно восстановлена из дампа: $DUMP_FILE"
+else
+    echo "Произошла ошибка при восстановлении базы данных."
+fi
