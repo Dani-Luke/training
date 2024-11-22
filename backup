@@ -1,15 +1,21 @@
 #!/bin/bash
 
+DB_NAME="testdb"
+DB_USER="root"
 DB_PASS="qwerty123456"
-CONTAINER_NAME="mysql_container"  
-BACKUP_DIR="./db_backups"
+BACKUP_DIR="/root/mysqltest/db_backups"
+TIMESTAMP=$(date +"%Y%m%d_%H%M%S")
+DUMP_FILE="$BACKUP_DIR/${DB_NAME}_${TIMESTAMP}.sql"
+CONTAINER_NAME="mysql_container" 
 
 mkdir -p "$BACKUP_DIR"
 
-docker exec -i "$CONTAINER_NAME" mysqldump -uroot -p"$DB_PASS" testdb > "$BACKUP_DIR/dumpfile2.sql"
+find "$BACKUP_DIR" -type f -name "*.sql" -mtime +7 -exec rm {} \;
+
+docker exec -i "$CONTAINER_NAME" mysqldump -uroot -p"$DB_PASS" testdb > "$DUMP_FILE"
 
 if [ $? -eq 0 ]; then
-    echo "Дамп базы данных успешно создан: $BACKUP_DIR/dumpfile2.sql"
+    echo "Дамп базы данных успешно создан: $BACKUP_DIR/$DUMP_FILE"
 else
     echo "Произошла ошибка при создании дампа."
 fi
