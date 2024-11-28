@@ -1,0 +1,55 @@
+version: '3.8'
+
+services:
+  traefik:
+    image: traefik:v2.4
+    command:
+      - "--api.insecure=true"
+      - "--providers.docker=true"
+      - "--entrypoints.web.address=:80"
+    ports:
+      - "80:80"   # Порт для HTTP
+      - "8080:8080"  # Порт для интерфейса Traefik Dashboard
+    volumes:
+      - "/var/run/docker.sock:/var/run/docker.sock"  # Доступ к сокету Docker
+
+  mysql:
+    image: mysql:latest
+    container_name: mysql_container
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: "123456"  # Установите корневой пароль
+      MYSQL_DATABASE: testdb  # Создайте базу данных по умолчанию
+    volumes:
+      - mysql_data:/var/lib/mysql
+
+  nginx:
+    image: nginx:alpine
+    container_name: nginx_container
+    restart: always
+    volumes:
+      - ./nginx.conf:/etc/nginx/conf.d/default.conf  # Обязательно создайте файл конфигурации nginx.conf
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.nginx.rule=Host(`192.168.0.187`)"  # Замените здесь на ваш локальный IP-адрес
+      - "traefik.http.services.nginx.loadbalancer.server.port=80"
+
+  phpmyadmin:
+    image: phpmyadmin/phpmyadmin
+    container_name: phpmyadmin_container
+    restart: always
+    environment:
+      PMA_HOST: mysql  # Имя хоста MySQL
+      PMA_PORT: 3306  # Порт MySQL
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.phpmyadmin.rule=Host(`192.168.0.187`)"  # Замените здесь на ваш локальный IP-адрес
+      - "traefik.http.services.phpmyadmin.loadbalancer.server.port=80"
+
+networks:
+  default:
+    external: true
+    name: main
+
+volumes:
+  mysql_data:
