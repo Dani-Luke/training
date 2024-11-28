@@ -1,0 +1,19 @@
+version: '3.8'
+
+services:
+   mysql:
+     image: mysql:latest
+     restart: always
+     container_name: mysql_container
+     environment:
+       MYSQL_ROOT_PASSWORD: "123456"  # Установите корневой пароль
+       MYSQL_DATABASE: testdb  # Создайте базу данных по умолчанию
+     ports:
+      - "127.0.0.1:3306:3306"
+     volumes:
+      - /root/baza/db:/var/lib/mysql
+
+networks:
+  default:
+    external: true
+    name: main
