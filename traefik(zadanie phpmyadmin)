@@ -1,0 +1,21 @@
+version: '3.8'
+
+services:
+  traefik:
+    image: traefik:v2.4
+    command:
+      - "--api.dashboard=true"
+      - "--api.insecure=true"
+      - "--providers.docker=true"
+      - "--entrypoints.web.address=:80"
+      - "--entrypoints.websecure.address=:443"
+    ports:
+      - "80:80"   # Порт для HTTP
+      - "8080:8080"  # Порт для интерфейса Traefik Dashboard
+    volumes:
+      - "/var/run/docker.sock:/var/run/docker.sock"  # Доступ к сокету Dock
+
+networks:
+  default:
+    external: true
+    name: main
