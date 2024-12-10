@@ -1,0 +1,15 @@
+server {
+    listen 80;
+
+    location / {
+        # Обработка всех маршрутов, кроме phpMyAdmin
+        root /usr/share/nginx/html;
+        index index.html index.htm;
+    }
+
+    # Позволяем Traefik обрабатывать запросы к phpMyAdmin
+    location /phpmyadmin {
+        # Здесь может быть просто пустое тело или указание на 404
+        # return 404; # или просто оставить его пустым
+    }
+}
